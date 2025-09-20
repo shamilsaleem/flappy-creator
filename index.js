@@ -3,6 +3,7 @@ const multer = require('multer');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path')
 const crypto = require('crypto');
+const hbs = require("hbs");
 
 const app = express();
 const port = process.env.PORT || 3000
@@ -11,6 +12,11 @@ const port = process.env.PORT || 3000
 app.use(express.static(path.join(__dirname, "public")));
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
+
+
+hbs.registerHelper("json", function (context) {
+  return JSON.stringify(context);
+});
 
 // ---------- SQLite setup ----------
 const db = new sqlite3.Database('./flappy.db', (err) => {
@@ -94,12 +100,66 @@ app.post('/create', cpUpload, (req, res) => {
         console.error(err);
         res.status(500).send('DB error');
       } else {
-        res.render('uploaded', { gameId: hash, gameName: gameData.game_name });
+        res.render('uploaded', { game_id: hash, game_name: gameData.game_name });
       }
     });
 
   stmt.finalize();
 });
+
+
+app.get('/play', (req, res) => {
+  const id = req.query.id;
+  if (!id) return res.status(400).send('Missing game ID');
+
+  db.get('SELECT * FROM games WHERE id=?', [id], (err, row) => {
+    if (err || !row) return res.status(404).send('Game not found');
+
+    // Convert BLOBs to base64 data URLs
+    const background = row.background ? `data:image/png;base64,${row.background.toString('base64')}` : null;
+    const bird = row.bird ? `data:image/png;base64,${row.bird.toString('base64')}` : null;
+    const ground = row.ground ? `data:image/png;base64,${row.ground.toString('base64')}` : null;
+    const tube1 = row.tube1 ? `data:image/png;base64,${row.tube1.toString('base64')}` : null;
+    const tube2 = row.tube2 ? `data:image/png;base64,${row.tube2.toString('base64')}` : null;
+    const sfx_hit = row.sfx_hit ? true : null;
+    const sfx_point = row.sfx_point ? true : null;
+    const sfx_wing = row.sfx_wing ? true : null;
+
+    var game_data = {
+      game_id: id,
+      game_name: row.game_name,
+      background,
+      bird,
+      ground,
+      tube1,
+      tube2,
+      sfx_hit,
+      sfx_point,
+      sfx_wing
+    }
+
+    res.render('game', { game_data })
+  });
+});
+
+app.get('/assets/custom/:id/:asset', (req, res) => {
+  const { id, asset } = req.params;
+  const columnMap = {
+    'sfx_hit.mp3': { col: 'sfx_hit', type: 'audio/mpeg' },
+    'sfx_point.mp3': { col: 'sfx_point', type: 'audio/mpeg' },
+    'sfx_wing.mp3': { col: 'sfx_wing', type: 'audio/mpeg' }
+  };
+
+  const entry = columnMap[asset];
+  if (!entry) return res.status(404).send('Unknown asset');
+
+  db.get(`SELECT ${entry.col} AS blob FROM games WHERE id=?`, [id], (err, row) => {
+    if (err || !row || !row.blob) return res.status(404).send('Not found');
+    res.setHeader('Content-Type', entry.type);
+    res.send(row.blob);
+  });
+});
+
 
 // ---------- Start server ----------
 app.listen(port, () => {

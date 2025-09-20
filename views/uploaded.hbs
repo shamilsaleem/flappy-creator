@@ -98,12 +98,12 @@
 <body>
     <div class="card">
         <h1>Game Uploaded!</h1>
-        <p id="gameNameDisplay">{{gameName}}</p>
+        <p id="gameNameDisplay">{{game_name}}</p>
 
         <input type="text" id="shareUrl" readonly>
         <button id="shareBtn">Copy Play Link</button>
 
-        <button onclick="location.href='/play?id={{gameId}}'">Play Game</button>
+        <button onclick="location.href='/play?id={{game_id}}'">Play Game</button>
     </div>
     <div id="github"></div>
 
