@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Create Flappy</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+/* ================= THEME ================= */
+:root{
+  --sky:#70c5ce;
+  --pipe:#5bd94a;
+  --pipe-dark:#33992a;
+  --ground:#d9b86a;
+  --accent:#ffde00;
+  --ok:#27ae60;
+  --err:#e74c3c;
+  --card:#fffbe6;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  padding:18px;
+  font-family:'Press Start 2P', monospace;
+  background:linear-gradient(#7fd0db, #a0e1e8);
+}
+.wrap{width:100%;max-width:980px}
+form.card{
+  background:var(--card);
+  border:8px solid var(--pipe-dark);
+  border-radius:12px;
+  padding:18px;
+  box-shadow:0 8px 30px rgba(20,30,40,0.12);
+}
+header{text-align:center;margin-bottom:16px}
+header h1{margin:0;font-size:18px;color:var(--accent);text-shadow:2px 2px #333}
+header p{margin:8px 0 0;font-size:12px;line-height:1.4;color:#222}
+.meta-row{display:flex;gap:10px;margin-bottom:12px}
+.meta-row .field{flex:1}
+.grid{display:grid;grid-template-columns: repeat(3,1fr);gap:12px}
+.field{
+  background:#fff;
+  padding:10px;
+  border:4px solid var(--pipe-dark);
+  border-radius:8px;
+  min-height:150px;
+}
+label{display:block;font-size:10px;margin-bottom:6px}
+input[type="text"]{
+  width:100%;padding:8px;border:2px solid #ccc;border-radius:6px;
+  font-family:inherit;font-size:12px;
+}
+input[type=file]{width:100%;font-size:11px;padding:6px;border-radius:6px}
+.status{font-size:11px;margin-top:6px;min-height:18px}
+.status.ok{color:var(--ok)}
+.status.err{color:var(--err)}
+.preview img{
+  display:block;margin-top:6px;max-width:100%;
+  border:2px solid var(--pipe-dark);
+}
+.default-preview{margin-top:6px;font-size:10px;color:#555;text-align:center}
+.default-preview img,audio{max-width:100%;margin-top:4px}
+.note{font-size:11px;margin-top:14px;color:#333}
+.controls{margin-top:14px;display:flex;gap:8px;align-items:center}
+button{
+  background:var(--pipe);
+  border:4px solid var(--pipe-dark);
+  color:#fff;
+  padding:12px 14px;
+  border-radius:8px;
+  font-family:inherit;
+  font-size:13px;
+  cursor:pointer;
+  flex:1;
+}
+button:disabled{opacity:0.45;cursor:not-allowed}
+.hint{font-size:11px;color:#444;text-align:right;flex:1}
+/* Responsive */
+@media (max-width:920px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:560px){
+  .grid{grid-template-columns:1fr}
+  .meta-row{flex-direction:column}
+  header h1{font-size:16px}
+  header p{font-size:11px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<form id="assetForm" class="card" action="/create" method="post" enctype="multipart/form-data" novalidate>
+  <header>
+    <h1>Create Flappy</h1>
+    <p>🕹️ Enter a <strong>Game Name</strong> (required).  
+       All media are optional — if you select a file it must match the listed size/type.</p>
+  </header>
+
+  <!-- Game meta -->
+  <div class="meta-row">
+    <div class="field">
+      <label for="gameName">Game Name (required)</label>
+      <input id="gameName" name="gameName" type="text" placeholder="My Flappy Clone" required>
+      <div id="gameNameStatus" class="status"></div>
+    </div>
+    <div class="field">
+      <label for="creatorName">Creator Name (optional)</label>
+      <input id="creatorName" name="creatorName" type="text" placeholder="Your name">
+      <div class="status"></div>
+    </div>
+  </div>
+
+  <!-- Assets grid -->
+  <div class="grid">
+    <!-- Each field shows default asset -->
+    <div class="field">
+      <label for="background">Background PNG — 288×384</label>
+      <div class="default-preview">
+        <div>Default:</div>
+        <img src="../classic/assets/bg.png" alt="bg preview" width="25%">
+      </div>
+      <input id="background" name="background" type="file" accept="image/png">
+      <div id="backgroundStatus" class="status"></div>
+      <div id="backgroundPreview" class="preview"></div>
+    </div>
+
+    <div class="field">
+      <label for="bird">Bird PNG — 108×26</label>
+      <div class="default-preview"><div>Default:</div>
+        <img src="../classic/assets/bird.png" alt="bird preview">
+      </div>
+      <input id="bird" name="bird" type="file" accept="image/png">
+      <div id="birdStatus" class="status"></div>
+      <div id="birdPreview" class="preview"></div>
+    </div>
+
+    <div class="field">
+      <label for="ground">Ground PNG — 336×112</label>
+      <div class="default-preview"><div>Default:</div>
+        <img src="../classic/assets/ground.png" alt="ground preview">
+      </div>
+      <input id="ground" name="ground" type="file" accept="image/png">
+      <div id="groundStatus" class="status"></div>
+      <div id="groundPreview" class="preview"></div>
+    </div>
+
+    <div class="field">
+      <label for="tube1">Tube-1 PNG — 52×320</label>
+      <div class="default-preview"><div>Default:</div>
+        <img src="../classic/assets/tube1.png" alt="tube1 preview" width="5%">
+      </div>
+      <input id="tube1" name="tube1" type="file" accept="image/png">
+      <div id="tube1Status" class="status"></div>
+      <div id="tube1Preview" class="preview"></div>
+    </div>
+
+    <div class="field">
+      <label for="tube2">Tube-2 PNG — 52×320</label>
+      <div class="default-preview"><div>Default:</div>
+        <img src="../classic/assets/tube2.png" alt="tube2 preview" width="5%">
+      </div>
+      <input id="tube2" name="tube2" type="file" accept="image/png">
+      <div id="tube2Status" class="status"></div>
+      <div id="tube2Preview" class="preview"></div>
+    </div>
+
+    <div class="field">
+      <label for="hit">Sound — hit (MP3)</label>
+      <div class="default-preview"><div>Default:</div>
+        <audio controls src="../classic/assets/sfx_hit.mp3"></audio>
+      </div>
+      <input id="hit" name="hit" type="file" accept="audio/mpeg">
+      <div id="hitStatus" class="status"></div>
+      <div id="hitPreview" class="preview"></div>
+    </div>
+
+    <div class="field">
+      <label for="point">Sound — point (MP3)</label>
+      <div class="default-preview"><div>Default:</div>
+        <audio controls src="../classic/assets/sfx_point.mp3"></audio>
+      </div>
+      <input id="point" name="point" type="file" accept="audio/mpeg">
+      <div id="pointStatus" class="status"></div>
+      <div id="pointPreview" class="preview"></div>
+    </div>
+
+    <div class="field">
+      <label for="wing">Sound — wing (MP3)</label>
+      <div class="default-preview"><div>Default:</div>
+        <audio controls src="../classic/assets/sfx_wing.mp3"></audio>
+      </div>
+      <input id="wing" name="wing" type="file" accept="audio/mpeg">
+      <div id="wingStatus" class="status"></div>
+      <div id="wingPreview" class="preview"></div>
+    </div>
+  </div>
+
+  <div class="note">
+    Empty fields are fine — but any selected file must exactly match its required size/type.
+  </div>
+
+  <div class="controls">
+    <div class="hint" id="formHint">Enter a game name to enable submit.</div>
+    <button id="submitBtn" type="submit" disabled>Submit Assets</button>
+  </div>
+</form>
+</div>
+
+<script>
+const specs = {
+  background:{w:288,h:384},
+  bird:{w:108,h:26},
+  ground:{w:336,h:112},
+  tube1:{w:52,h:320},
+  tube2:{w:52,h:320}
+};
+const audios=['hit','point','wing'];
+const $=id=>document.getElementById(id);
+const submitBtn=$('submitBtn'),formHint=$('formHint'),gameNameInput=$('gameName'),form=$('assetForm');
+
+function setStatus(id,ok,msg){
+  const s=$(id+'Status');
+  s.className='status '+(ok?'ok':'err');
+  s.textContent=msg;
+}
+
+function validateImageField(id,cfg){
+  const input=$(id);
+  const preview=$(id+'Preview');
+  preview.innerHTML='';
+  const file=input.files[0];
+  if(!file){ setStatus(id,true,'No file selected'); return Promise.resolve(true); }
+  return new Promise(res=>{
+    const url=URL.createObjectURL(file);
+    const img=new Image();
+    img.onload=()=>{
+      const w=img.naturalWidth,h=img.naturalHeight;
+      img.style.maxWidth='100%';
+      preview.appendChild(img);
+      if(w===cfg.w && h===cfg.h){setStatus(id,true,`OK — ${w}×${h}`);res(true);}
+      else{setStatus(id,false,`Wrong size ${w}×${h}`);res(false);}
+      URL.revokeObjectURL(url);
+    };
+    img.onerror=()=>{setStatus(id,false,'Cannot read image');res(false);URL.revokeObjectURL(url);};
+    img.src=url;
+  });
+}
+
+function validateAudioField(id){
+  const input=$(id);
+  const preview=$(id+'Preview');
+  preview.innerHTML='';
+  const file=input.files[0];
+  if(!file){ setStatus(id,true,'No file selected'); return Promise.resolve(true);}
+  if(!file.name.toLowerCase().endsWith('.mp3')){
+    setStatus(id,false,'Must be .mp3'); return Promise.resolve(false);
+  }
+  const url=URL.createObjectURL(file);
+  const audio=document.createElement('audio');
+  audio.controls=true; audio.src=url;
+  preview.appendChild(audio);
+  return new Promise(res=>{
+    audio.onloadedmetadata=()=>{setStatus(id,true,'OK');res(true);URL.revokeObjectURL(url);};
+    audio.onerror=()=>{setStatus(id,false,'Invalid MP3');res(false);URL.revokeObjectURL(url);};
+  });
+}
+
+async function validateAll(){
+  const nameOk=!!gameNameInput.value.trim();
+  $('gameNameStatus').className='status '+(nameOk?'ok':'err');
+  $('gameNameStatus').textContent=nameOk?'OK':'Required';
+  const imageKeys=Object.keys(specs);
+  const imgResults=await Promise.all(imageKeys.map(k=>validateImageField(k,specs[k])));
+  const audResults=await Promise.all(audios.map(a=>validateAudioField(a)));
+  const allOk=nameOk && imgResults.every(Boolean) && audResults.every(Boolean);
+  submitBtn.disabled=!allOk;
+  formHint.textContent=allOk?'Ready to submit':'Enter name & fix errors';
+}
+window.addEventListener('load',validateAll);
+gameNameInput.addEventListener('input',validateAll);
+document.querySelectorAll('input[type=file]').forEach(i=>i.addEventListener('change',validateAll));
+form.addEventListener('submit',async e=>{
+  await validateAll();
+  if(submitBtn.disabled) e.preventDefault();
+});
+</script>
+</body>
+</html>

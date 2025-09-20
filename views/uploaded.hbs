@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Game Uploaded</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+:root{
+  --accent:#ffde00;
+  --pipe:#5bd94a;
+  --pipe-dark:#33992a;
+  --card:#fffbe6;
+}
+body{
+  font-family:'Press Start 2P', monospace;
+  background: linear-gradient(#7fd0db,#a0e1e8);
+  color:#222;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+  padding:20px;
+  text-align:center;
+}
+.card{
+  background:var(--card);
+  border:8px solid var(--pipe-dark);
+  border-radius:12px;
+  padding:24px;
+  max-width:400px;
+  width:100%;
+  box-shadow:0 8px 30px rgba(0,0,0,0.1);
+}
+h1{
+  color:var(--accent);
+  font-size:24px;
+  text-shadow:2px 2px #333;
+  margin-bottom:20px;
+}
+p{font-size:12px;margin-bottom:24px}
+button{
+  background:var(--pipe);
+  border:4px solid var(--pipe-dark);
+  color:#fff;
+  padding:12px 16px;
+  border-radius:8px;
+  font-family:inherit;
+  font-size:12px;
+  cursor:pointer;
+  margin-top:8px;
+  width:100%;
+}
+button:hover{transform:scale(1.05)}
+input#shareUrl{
+  width:100%;
+  font-family:inherit;
+  font-size:11px;
+  padding:8px;
+  border:2px solid #ccc;
+  border-radius:6px;
+  margin-bottom:12px;
+}
+@media(max-width:480px){
+  h1{font-size:20px}
+  button{font-size:11px;padding:10px}
+}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>Game Uploaded!</h1>
+  <p id="gameNameDisplay">{{gameName}}</p>
+
+  <input type="text" id="shareUrl" readonly>
+  <button id="shareBtn">Copy Play Link</button>
+
+  <button onclick="location.href='/play?id={{gameId}}'">Play Game</button>
+</div>
+
+<script>
+const gameId = "{{gameId}}";
+const gameName = "{{gameName}}";
+document.getElementById('gameNameDisplay').textContent = gameName;
+const playUrl = window.location.origin + "/play?id=" + gameId;
+const shareInput = document.getElementById('shareUrl');
+shareInput.value = playUrl;
+
+document.getElementById('shareBtn').addEventListener('click', ()=>{
+  shareInput.select();
+  shareInput.setSelectionRange(0, 99999); 
+  document.execCommand('copy');
+  alert('Play link copied to clipboard!');
+});
+</script>
+</body>
+</html>
