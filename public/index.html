@@ -1,70 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Flappy Creator</title>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-<style>
-:root {
-  --sky: #70c5ce;
-  --pipe: #5bd94a;
-  --pipe-dark: #33992a;
-  --accent: #ffde00;
-  --button-bg: #5bd94a;
-  --button-border: #33992a;
-}
-*{box-sizing:border-box;margin:0;padding:0;}
-body{
-  font-family:'Press Start 2P',monospace;
-  background:linear-gradient(#7fd0db,#a0e1e8);
-  color:#222;
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  text-align:center;
-  padding:20px;
-}
-h1{
-  font-size:28px;
-  color:var(--accent);
-  text-shadow:2px 2px #333;
-  margin-bottom:50px;
-}
-.buttons{
-  display:flex;
-  flex-direction:column;
-  gap:30px;
-  width:100%;
-  max-width:280px;
-}
-button{
-  background:var(--button-bg);
-  border:4px solid var(--button-border);
-  color:#fff;
-  padding:16px 12px;
-  border-radius:8px;
-  font-family:inherit;
-  font-size:14px;
-  cursor:pointer;
-  transition: transform 0.1s;
-}
-button:hover{
-  transform: scale(1.05);
-}
-@media(max-width:480px){
-  h1{font-size:22px;margin-bottom:30px;}
-  button{padding:14px 10px;font-size:12px;}
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flappy Creator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --sky: #70c5ce;
+      --pipe: #5bd94a;
+      --pipe-dark: #33992a;
+      --accent: #ffde00;
+      --button-bg: #5bd94a;
+      --button-border: #33992a;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Press Start 2P', monospace;
+      background: linear-gradient(#7fd0db, #a0e1e8);
+      color: #222;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 28px;
+      color: var(--accent);
+      text-shadow: 2px 2px #333;
+      margin-bottom: 50px;
+    }
+
+    .buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      width: 100%;
+      max-width: 280px;
+    }
+
+    button {
+      background: var(--button-bg);
+      border: 4px solid var(--button-border);
+      color: #fff;
+      padding: 16px 12px;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 14px;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+    }
+
+    #github {
+      position: absolute;
+      bottom: 5px;
+      right: 5px;
+    }
+
+    @media(max-width:480px) {
+      h1 {
+        font-size: 22px;
+        margin-bottom: 30px;
+      }
+
+      button {
+        padding: 14px 10px;
+        font-size: 12px;
+      }
+    }
+  </style>
 </head>
+
 <body>
   <h1>Flappy Creator</h1>
   <div class="buttons">
     <button onclick="location.href='/classic'">PLAY CLASSIC</button>
     <button onclick="location.href='/create'">CREATE GAME</button>
   </div>
+  <div id="github"></div>
 </body>
+<script>
+  var githubHtml = '<iframe src="http://ghbtns.com/github-btn.html?user=shamilsaleem&repo=flappy-creator&type=watch&count=true&size=large"\nallowtransparency="true" frameborder="0" scrolling="0" width="150" height="30"></iframe>'
+  document.querySelector("#github").innerHTML = githubHtml
+</script>
+
 </html>
