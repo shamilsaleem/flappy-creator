@@ -55,6 +55,21 @@ const cpUpload = upload.fields([
   { name: 'wing', maxCount: 1 },
 ]);
 
+var gameCount
+
+function updateGameCount() {
+  db.get('SELECT COUNT(*) AS count FROM games', (err, row) => {
+    if (err) {
+      console.error(err);
+    } else {
+      gameCount = row.count
+    }
+  });
+}
+
+setInterval(updateGameCount, 5000)
+
+app.get('/count', (req, res) => res.send(gameCount))
 
 // ---------- Handle POST ----------
 app.post('/create', cpUpload, (req, res) => {
@@ -128,6 +143,7 @@ app.get('/play', (req, res) => {
     var game_data = {
       game_id: id,
       game_name: row.game_name,
+      game_creator: row.creator_name,
       background,
       bird,
       ground,

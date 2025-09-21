@@ -110,10 +110,7 @@
     <script>
         var githubHtml = '<iframe src="http://ghbtns.com/github-btn.html?user=shamilsaleem&repo=flappy-creator&type=watch&count=true&size=large"\nallowtransparency="true" frameborder="0" scrolling="0" width="150" height="30"></iframe>'
         document.querySelector("#github").innerHTML = githubHtml
-        const gameId = "{{gameId}}";
-        const gameName = "{{gameName}}";
-        document.getElementById('gameNameDisplay').textContent = gameName;
-        const playUrl = window.location.origin + "/play?id=" + gameId;
+        const playUrl = window.location.origin + "/play?id=" + "{{ game_id }}";
         const shareInput = document.getElementById('shareUrl');
         shareInput.value = playUrl;
 

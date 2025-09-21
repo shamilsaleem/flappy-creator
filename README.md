@@ -1,9 +1,23 @@
 
-# flappy-creator
+<div align="center">
+    <h1>flappy-creator</h1>
+    <img src="./public/favicon.ico" width="100px">
+    <p>A simple Flappy Fird parody game creator with custom pictures and sound effects using <a
+            href="https://nodejs.org/">Node.Js</a> and 
+            <a href="https://sqlite.org/">SQLite</a>.</p>
+    <p>A fork of <a href="https://github.com/hyspace/flappy">hyspace/flappy</a>.</p>
 
-A simple parody flappy bird game creator using Node.js and SQLite.
+<p align="center">
+  <a href="https://nodejs.org" target="_blank">
+    <img src="https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js" />
+  </a>
+  <a href="https://nodejs.org" target="_blank">
+    <img src="https://img.shields.io/badge/SQLite-044A64?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite" />
+  </a>
+</p>
 
-A fork of [hyspace/flappy](https://github.com/hyspace/flappy)
+</div>
+
 
 ## Screenshots
 <div align="center">

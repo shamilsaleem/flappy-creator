@@ -4,6 +4,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta property="og:title" content="Flappy Creator">
+  <meta property="og:description" content="Create parody Flappy Bird game using custom photos and sounds.">
+  <meta property="og:type" content="website">
   <title>Flappy Creator</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
@@ -92,10 +95,24 @@
     <img src="assets/bird.png" alt="">
     <button onclick="location.href='/classic'">PLAY CLASSIC</button>
     <button onclick="location.href='/create'">CREATE GAME</button>
+    <p><span id="gameCount"></span> games created!</p>
   </div>
   <div id="github"></div>
 </body>
 <script>
+  function updateGanmeCount() {
+    fetch("/count")
+      .then(res => res.text())
+      .then(count => {
+        document.getElementById("gameCount").textContent = count;
+      })
+      .catch(err => {
+        console.error("Error fetching online count:", err);
+      });
+  }
+
+  updateGanmeCount();
+  setInterval(updateGanmeCount, 5000);
   var githubHtml = '<iframe src="http://ghbtns.com/github-btn.html?user=shamilsaleem&repo=flappy-creator&type=watch&count=true&size=large"\nallowtransparency="true" frameborder="0" scrolling="0" width="150" height="30"></iframe>'
   document.querySelector("#github").innerHTML = githubHtml
 </script>

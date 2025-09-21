@@ -248,7 +248,7 @@
         </div>
 
         <div class="field">
-          <label for="bird">Bird PNG — 108×26</label>
+          <label for="bird">Bird PNG — 108×26 or 36x26</label>
           <div class="default-preview">
             <div>Default:</div>
             <img src="../assets/bird.png" alt="bird preview">
@@ -339,14 +339,14 @@
   <script>
     const specs = {
       background: { w: 288, h: 384 },
-      bird: { w: 108, h: 26 },
       ground: { w: 336, h: 112 },
       tube1: { w: 52, h: 320 },
       tube2: { w: 52, h: 320 }
     };
     const audios = ['hit', 'point', 'wing'];
     const $ = id => document.getElementById(id);
-    const submitBtn = $('submitBtn'), formHint = $('formHint'), gameNameInput = $('gameName'), form = $('assetForm');
+    const submitBtn = $('submitBtn'), formHint = $('formHint'),
+      gameNameInput = $('gameName'), form = $('assetForm');
 
     function setStatus(id, ok, msg) {
       const s = $(id + 'Status');
@@ -354,21 +354,66 @@
       s.textContent = msg;
     }
 
+    async function tileBirdIfNeeded(id) {
+      const input = $(id), preview = $(id + 'Preview');
+      const birdInput = document.getElementById("bird")
+      const file = birdInput.files[0];
+      if (!file) return;
+
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+
+      img.onload = () => {
+        if (img.width === 108 && img.height === 26) {
+          return;
+        }
+
+        if (img.width === 36 && img.height === 26) {
+          const canvas = document.createElement('canvas');
+          canvas.width = 108;
+          canvas.height = 26;
+          const ctx = canvas.getContext('2d');
+
+          for (let i = 0; i < 3; i++) ctx.drawImage(img, i * 36, 0);
+
+          canvas.toBlob(blob => {
+            const dt = new DataTransfer();
+            dt.items.add(new File([blob], 'bird.png', { type: 'image/png' }));
+            birdInput.files = dt.files;
+            preview.appendChild(blob);
+            return
+          }, 'image/png');
+
+        } else {
+          return;
+        }
+
+      }
+    }
+
     function validateImageField(id, cfg) {
-      const input = $(id);
-      const preview = $(id + 'Preview');
+      const input = $(id), preview = $(id + 'Preview');
       preview.innerHTML = '';
       const file = input.files[0];
       if (!file) { setStatus(id, true, 'No file selected'); return Promise.resolve(true); }
       return new Promise(res => {
         const url = URL.createObjectURL(file);
         const img = new Image();
-        img.onload = () => {
+        img.onload = async () => {
           const w = img.naturalWidth, h = img.naturalHeight;
           img.style.maxWidth = '100%';
           preview.appendChild(img);
-          if (w === cfg.w && h === cfg.h) { setStatus(id, true, `OK — ${w}×${h}`); res(true); }
-          else { setStatus(id, false, `Wrong size ${w}×${h}`); res(false); }
+          if (id === 'bird') {
+            if ((w === 108 && h === 26) || (w === 36 && h === 26)) {
+              setStatus(id, true, `OK — ${w}×${h}`); res(true);
+              if (w === 36 && h === 26) {
+                await tileBirdIfNeeded(id)
+              }
+            } else { setStatus(id, false, `Wrong size ${w}×${h}`); res(false); }
+          } else {
+            if (w === cfg.w && h === cfg.h) { setStatus(id, true, `OK — ${w}×${h}`); res(true); }
+            else { setStatus(id, false, `Wrong size ${w}×${h}`); res(false); }
+          }
           URL.revokeObjectURL(url);
         };
         img.onerror = () => { setStatus(id, false, 'Cannot read image'); res(false); URL.revokeObjectURL(url); };
@@ -377,8 +422,7 @@
     }
 
     function validateAudioField(id) {
-      const input = $(id);
-      const preview = $(id + 'Preview');
+      const input = $(id), preview = $(id + 'Preview');
       preview.innerHTML = '';
       const file = input.files[0];
       if (!file) { setStatus(id, true, 'No file selected'); return Promise.resolve(true); }
@@ -399,8 +443,8 @@
       const nameOk = !!gameNameInput.value.trim();
       $('gameNameStatus').className = 'status ' + (nameOk ? 'ok' : 'err');
       $('gameNameStatus').textContent = nameOk ? 'OK' : 'Required';
-      const imageKeys = Object.keys(specs);
-      const imgResults = await Promise.all(imageKeys.map(k => validateImageField(k, specs[k])));
+      const imgKeys = Object.keys(specs).concat('bird');
+      const imgResults = await Promise.all(imgKeys.map(k => k === 'bird' ? validateImageField(k, {}) : validateImageField(k, specs[k])));
       const audResults = await Promise.all(audios.map(a => validateAudioField(a)));
       const allOk = nameOk && imgResults.every(Boolean) && audResults.every(Boolean);
       submitBtn.disabled = !allOk;
@@ -409,9 +453,13 @@
     window.addEventListener('load', validateAll);
     gameNameInput.addEventListener('input', validateAll);
     document.querySelectorAll('input[type=file]').forEach(i => i.addEventListener('change', validateAll));
+
+
+
     form.addEventListener('submit', async e => {
       await validateAll();
-      if (submitBtn.disabled) e.preventDefault();
+      if (submitBtn.disabled) { e.preventDefault(); return; }
+      await tileBirdIfNeeded();
     });
   </script>
 </body>

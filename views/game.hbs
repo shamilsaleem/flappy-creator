@@ -4,12 +4,56 @@
 <head>
   <title>Flappy Bird</title>
   <meta name="viewport" content="width=device-width, user-scalable=no">
+  <meta property="og:title" content="Play {{game_data.game_name}} - Flappy Creator">
+  <meta property="og:description" content="Created by {{game_data.game_creator}}. Create your own parody game.">
+  <meta property="og:type" content="website">
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <script>
     var game_datas = {{{ json game_data }}}
-    document.title = game_datas.game_name
+    document.title = game_datas.game_name + " - Flappy Creator"
   </script>
   <style>
+    :root {
+      font-family: 'Press Start 2P', monospace;
+      --accent: #ffde00;
+      --pipe: #5bd94a;
+      --pipe-dark: #33992a;
+      --card: #fffbe6;
+    }
+
+
+    button {
+      background: var(--pipe);
+      border: 4px solid var(--pipe-dark);
+      color: #fff;
+      padding: 5px 16px;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 10px;
+      cursor: pointer;
+      margin-top: 8px;
+      width: 50%;
+    }
+
+    button:hover {
+      transform: scale(1.05)
+    }
+
+    input#shareUrl {
+      width: 50%;
+      font-family: inherit;
+      font-size: 5px;
+      padding: 5px;
+      border: 2px solid #ccc;
+      border-radius: 6px;
+      margin-bottom: 0px;
+      margin-top: 20px;
+    }
+
+    .center {
+      display: grid;
+      place-items: center;
+    }
 
     body {
       margin: 0;
@@ -37,14 +81,30 @@
       font-size: 24px;
       top: 50%;
     }
-
   </style>
 </head>
 
 <body>
   <div id="loading">Loading...</div>
   <div id="screen"></div>
+  <div class="center">
+    <input type="text" id="shareUrl" readonly>
+    <button id="shareBtn">Copy Play Link</button>
+  </div>
   <div id="github"></div>
+
+  <script>
+    const playUrl = window.location.origin + "/play?id=" + game_datas.game_id;
+    const shareInput = document.getElementById('shareUrl');
+    shareInput.value = playUrl;
+
+    document.getElementById('shareBtn').addEventListener('click', () => {
+      shareInput.select();
+      shareInput.setSelectionRange(0, 99999);
+      document.execCommand('copy');
+      alert('Play link copied to clipboard!');
+    });
+  </script>
   <script src="../index.min.js?v=02131824"></script>
 </body>
 
